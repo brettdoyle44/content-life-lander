@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import { Link, animateScroll as scroll } from "react-scroll"
+import { Link } from "react-scroll"
 import React from "react"
 import logo from "../../static/images/CONTENT-LIFE-logo.png"
 
