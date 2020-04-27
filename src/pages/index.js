@@ -10,7 +10,7 @@ import thumbnailBoard from "../../static/images/storyboard-cl-main.png"
 import thumbnailNews from "../../static/images/cl-collaborate-screen.png"
 import thumbnailTeams from "../../static/images/CL-analyze-data.png"
 import styled from "styled-components"
-import { Link, animateScroll as scroll } from "react-scroll"
+import { Link } from "react-scroll"
 
 const Image = styled.img`
   border-radius: 15px;
@@ -40,6 +40,28 @@ const HeaderInput = styled.input`
   border-width: 1px;
   border-style: solid;
   border-color: #5369f8;
+  border-image: initial;
+  border-radius: 4px;
+  padding: 8px 16px;
+  outline: 0px;
+  margin-bottom: 8px;
+  @media (min-width: 40em) {
+    max-width: 30em;
+    margin: 0;
+  }
+`
+
+const NotValidHeaderInput = styled.input`
+  font-weight: 500;
+  font-size: 16px;
+  color: red;
+  line-height: 42px;
+  width: 100%;
+  text-align: left;
+  height: 40px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: red;
   border-image: initial;
   border-radius: 4px;
   padding: 8px 16px;
@@ -90,18 +112,27 @@ const HeaderText = styled.p`
 
 const IndexPage = () => {
   const [email, setEmail] = useState("")
-  const [submit, setSubmit] = useState(false)
+  const [notValid, setNotValid] = useState(false)
 
   async function handleSubmit(event) {
     event.preventDefault()
+    const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     try {
-      await writeUserData(uuidv1(), email)
-      setSubmit(true)
+      if (validateEmail(email)) {
+        await writeUserData(uuidv1(), email)
+        setEmail("")
+        navigate("/confirm")
+      }
       setEmail("")
-      navigate("/confirm")
+      setNotValid(true)
     } catch (e) {
       console.error(e)
     }
+  }
+
+  function validateEmail(theEmail) {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    return re.test(theEmail)
   }
 
   function writeUserData(userId, theEmail) {
@@ -125,12 +156,21 @@ const IndexPage = () => {
           platform. Sign up for early access and you'll be the first to know
           when we're live.
         </HeaderText>
+
         <HeaderForm onSubmit={handleSubmit}>
-          <HeaderInput
-            onChange={e => setEmail(e.target.value)}
-            value={email}
-            placeholder="Your email"
-          />
+          {!notValid ? (
+            <HeaderInput
+              onChange={e => setEmail(e.target.value)}
+              value={email}
+              placeholder="Your email"
+            />
+          ) : (
+            <NotValidHeaderInput
+              onChange={e => setEmail(e.target.value)}
+              value={email}
+              placeholder="Please enter valid email"
+            />
+          )}
           <HeaderButton>Early access</HeaderButton>
         </HeaderForm>
         <Image alt={"Dashboard"} src={featureImage} />
